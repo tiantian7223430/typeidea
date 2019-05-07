@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>详细Post</title>
+</head>
+<body>
 {% if post %}
     <h1>{{ post.title }}</h1>
     <div>
@@ -7,3 +14,12 @@
     <hr />
     <p>{{ post.content }}</p>
 {% endif %}
+
+<div>侧边栏展示：
+    {% for sidebar in sidebars %}
+        <h4>{{ sidebar.title }}</h4>
+        {{ sidebar.content }}
+    {% endfor %}
+</div>
+</body>
+</html>
