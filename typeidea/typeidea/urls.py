@@ -21,7 +21,7 @@ from blog.views import (
     PostDetailView
 )
 from config.views import links
-from typeidea.custom_site import custom_site
+from .custom_site import custom_site
 
 
 urlpatterns = [

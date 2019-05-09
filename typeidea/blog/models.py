@@ -77,6 +77,7 @@ class Post(models.Model):
     tag = models.ForeignKey(Tag, verbose_name="标签")
     owner = models.ForeignKey(User, verbose_name="作者")
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
     pv = models.PositiveIntegerField(default=1)
     uv = models.PositiveIntegerField(default=1)
 
@@ -102,7 +103,7 @@ class Post(models.Model):
     @staticmethod
     def get_by_category(category_id):
         try:
-            category = Tag.objects.get(id=category_id)
+            category = Category.objects.get(id=category_id)
         except Tag.DoesNotExist:
             category = None
             post_list = []
@@ -112,8 +113,10 @@ class Post(models.Model):
         return post_list, category
 
     @classmethod
-    def latest_posts(cls):
+    def latest_posts(cls, with_related=True):
         queryset = cls.objects.filter(status=cls.STATUS_NORMAL)
+        if with_related:
+            queryset = queryset.select_related('owner', 'category')
         return queryset
 
     @classmethod

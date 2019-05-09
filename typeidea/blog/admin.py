@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib.admin.models import LogEntry
 from django.contrib import admin
 from django.urls import reverse
@@ -64,7 +67,7 @@ class PostAdmin(BaseOwnerAdmin):
     list_display_links = []
 
     # list_filter = ['category', ]
-    list_filter = [CategoryOwnerFilter]
+    list_filter = [CategoryOwnerFilter, ]
     search_fields = ['title', 'category__name']
 
     actions_on_top = True
@@ -74,15 +77,15 @@ class PostAdmin(BaseOwnerAdmin):
     save_on_top = True
 
     exclude = ('owner', )
-
-    # fields = (
-    #     ('category', 'title'),
-    #     'desc',
-    #     'status',
-    #     'content',
-    #     'tag',
-    # )
-
+    """
+    fields = (
+        ('category', 'title'),
+        'desc',
+        'status',
+        'content',
+        'tag',
+    )
+    """
     fieldsets = (
         ('基础配置', {
             'description': '基础配置描述',
@@ -98,10 +101,12 @@ class PostAdmin(BaseOwnerAdmin):
             ),
         }),
         ('额外信息', {
-            'classes': ('collapse',),
+            'classes': ('wide',),
             'fields': ('tag', ),
         })
     )
+    # filter_horizontal = ('tag', )
+    # filter_vertical = ('tag',)
 
     def operator(self, obj):
         return format_html(

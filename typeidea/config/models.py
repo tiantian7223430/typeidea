@@ -24,6 +24,9 @@ class Link(models.Model):
     class Meta:
         verbose_name = verbose_name_plural = '友链'
 
+    def __str__(self):
+        return self.title
+
 
 class SideBar(models.Model):
     STATUS_SHOW = 1
@@ -47,22 +50,24 @@ class SideBar(models.Model):
     display_type = models.PositiveIntegerField(default=1, choices=SIDE_TYPE, verbose_name="展示类型")
     content = models.CharField(max_length=500, blank=True, verbose_name="内容",
                                help_text="如果设置的不是HTML类型，可为空")
-    status = models.PositiveIntegerField(default=STATUS_SHOW,choices=STATUS_ITEMS, verbose_name="状态")
-    weight = models.PositiveIntegerField(default=1,
-                                         choices=zip(range(1, 6), range(1, 6)),
-                                         verbose_name="权重",
-                                         help_text="权重高战士顺序靠前")
+
+    status = models.PositiveIntegerField(default=STATUS_SHOW, choices=STATUS_ITEMS, verbose_name="状态")
     owner = models.ForeignKey(User, verbose_name="作者")
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 
     class Meta:
         verbose_name = verbose_name_plural = '侧边栏'
 
+    def __str__(self):
+        return self.title
+
+    def _render_latest(self):
+        pass
+
     @classmethod
     def get_all(cls):
         return cls.objects.filter(status=cls.STATUS_SHOW)
 
-    @property
     def content_html(self):
         """ 直接渲染模版 """
         from blog.models import Post         # 避免循环引用
@@ -73,7 +78,7 @@ class SideBar(models.Model):
             result = self.content
         elif self.display_type == self.DISPLAY_LATEST:
             context = {
-                'posts': Post.latest_posts()
+                'posts': Post.latest_posts(with_related=False)
             }
             result = render_to_string('config/blocks/sidebar_posts.html', context)
         elif self.display_type == self.DISPLAY_HOT:
