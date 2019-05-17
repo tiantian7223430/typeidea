@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+import mistune
+
 
 class Category(models.Model):
     STATUS_NORMAL = 1
@@ -77,6 +79,7 @@ class Post(models.Model):
     tag = models.ForeignKey(Tag, verbose_name="标签")
     owner = models.ForeignKey(User, verbose_name="作者")
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    content_html = models.TextField(verbose_name="正文 html 代码", blank=True, editable=False)
 
     pv = models.PositiveIntegerField(default=1)
     uv = models.PositiveIntegerField(default=1)
@@ -87,6 +90,10 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.content_html = mistune.markdown(self.content)
+        super().save(*args, **kwargs)
 
     @staticmethod
     def get_by_tag(tag_id):
