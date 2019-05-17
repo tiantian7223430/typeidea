@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 
@@ -68,3 +69,27 @@ class PostListView(ListView):
     paginate_by = 1
     context_object_name = 'post_list'   # 如果不设置此项，在模版中需要使用 object_list 变量
     template_name = 'blog/list.html'
+
+
+class SearchView(IndexView):
+    def get_context_data(self):
+        context = super().get_context_data()
+        context.update({
+            'keyword': self.request.GET.get('keyword', '')
+        })
+
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        keyword = self.request.GET.get('keyword')
+        if not keyword:
+            return queryset
+        return queryset.filter(Q(title__icontains=keyword)) | Q(desc_icontains=keyword)
+
+
+class AuthorView(IndexView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        author_id = self.kwargs.get('owner_id')
+        return queryset.filter(owner_id=author_id)
