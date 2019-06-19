@@ -76,11 +76,11 @@ class PostDetailView(CommonViewMixin, DetailView):
         increase_uv = False
         uid = self.request.uid
         pv_key = 'pv:%s:%s' % (uid, self.request.path)
-        uv_key = 'uv:%s:%s:%s' % (uid, str(date.today()), self.request.path)
         if not cache.get(pv_key):
             increase_pv = True
             cache.set(pv_key, 1, 1*60)     # 1 分钟有效
 
+        uv_key = 'uv:%s:%s:%s' % (uid, str(date.today()), self.request.path)
         if not cache.get(uv_key):
             increase_uv = True
             cache.set(uv_key, 1, 24*60*60)    # 24 小时有效
@@ -91,6 +91,7 @@ class PostDetailView(CommonViewMixin, DetailView):
             Post.objects.filter(pk=self.object.id).update(pv=F('pv') + 1)
         elif increase_uv:
             Post.objects.filter(pk=self.object.id).update(uv=F('uv') + 1)
+
 
 class PostListView(ListView):
     queryset = Post.latest_posts()
@@ -105,7 +106,6 @@ class SearchView(IndexView):
         context.update({
             'keyword': self.request.GET.get('keyword', '')
         })
-
         return context
 
     def get_queryset(self):
@@ -113,7 +113,7 @@ class SearchView(IndexView):
         keyword = self.request.GET.get('keyword')
         if not keyword:
             return queryset
-        return queryset.filter(Q(title__icontains=keyword)) | Q(desc_icontains=keyword)
+        return queryset.filter(Q(title__icontains=keyword) | Q(desc__icontains=keyword))
 
 
 class AuthorView(IndexView):

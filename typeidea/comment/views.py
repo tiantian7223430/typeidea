@@ -15,6 +15,7 @@ class CommentView(TemplateView):
         if comment_form.is_valid():
             instance = comment_form.save(commit=False)
             instance.target = target
+            instance.save()
             succeed = True
             return redirect(target)
         else:
